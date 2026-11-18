@@ -1,0 +1,162 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My To-Do List</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f4f8;
+            margin: 0;
+            padding: 40px;
+        }
+
+        .container {
+            max-width: 650px;
+            margin: auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+        }
+
+        button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            color: white;
+        }
+
+        .add-btn {
+            background: #2563eb;
+            width: 100%;
+        }
+
+        .complete-btn {
+            background: #16a34a;
+        }
+
+        .delete-btn {
+            background: #dc2626;
+        }
+
+        .task {
+            background: #f8fafc;
+            padding: 15px;
+            margin-top: 15px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+
+        .completed {
+            text-decoration: line-through;
+            color: gray;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .empty {
+            text-align: center;
+            color: gray;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>My To-Do List</h1>
+
+    <!-- Add Task Form -->
+    <form method="POST" action="{% url 'add_todo' %}">
+        {% csrf_token %}
+
+        <input type="text" name="title"
+               placeholder="Enter task title" required>
+
+        <textarea name="description"
+                  placeholder="Enter task description"></textarea>
+
+        <button type="submit" class="add-btn">
+            Add Task
+        </button>
+    </form>
+
+    <h2>My Tasks</h2>
+
+    {% for todo in todos %}
+
+        <div class="task">
+
+            <h3 class="{% if todo.completed %}completed{% endif %}">
+                {{ todo.title }}
+            </h3>
+
+            <p>{{ todo.description }}</p>
+
+            <p>
+                Status:
+                {% if todo.completed %}
+                    Completed
+                {% else %}
+                    Pending
+                {% endif %}
+            </p>
+
+            <div class="actions">
+
+                {% if not todo.completed %}
+                    <form method="POST"
+                          action="{% url 'complete_todo' todo.id %}">
+                        {% csrf_token %}
+                        <button class="complete-btn" type="submit">
+                            Complete
+                        </button>
+                    </form>
+                {% endif %}
+
+                <form method="POST"
+                      action="{% url 'delete_todo' todo.id %}">
+                    {% csrf_token %}
+                    <button class="delete-btn" type="submit">
+                        Delete
+                    </button>
+                </form>
+
+            </div>
+
+        </div>
+
+    {% empty %}
+
+        <p class="empty">No tasks added yet!</p>
+
+    {% endfor %}
+
+</div>
+
+</body>
+</html>
